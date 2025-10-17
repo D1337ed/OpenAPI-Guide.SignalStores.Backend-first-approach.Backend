@@ -1,0 +1,77 @@
+@a = http://localhost:5083/movies
+@b = http://localhost:5083/users
+
+GET {{a}}
+Accept: application/json
+
+###
+
+GET {{b}}/1
+Accept: application/json
+
+###
+
+GET {{b}}/3
+
+###
+
+PATCH {{b}}/3
+Content-Type: application/json
+
+{
+  "name": "admin21",
+  "accessLevel": 5
+}
+
+###
+
+DELETE {{b}}/3
+
+###
+
+POST {{a}}
+Content-Type: application/json
+
+{
+  "title": "jumanji",
+  "studio": "sony",
+  "year": 2027
+}
+
+###
+
+POST {{a}}
+Content-Type: application/json
+
+{
+  "title": "dune 3",
+  "studio": "21st century",
+  "year": 2028
+}
+
+###
+
+POST {{a}}
+Content-Type: application/json
+
+{
+  "id": 5,
+  "title": "avatar 3",
+  "studio": "columbia",
+  "year": 2029
+}
+
+###
+
+DELETE {{a}}/5
+
+###
+
+PATCH {{a}}/5
+Content-Type: application/json
+
+{
+  "title": "avatar",
+  "studio": "columbia",
+  "year": 2030
+}
