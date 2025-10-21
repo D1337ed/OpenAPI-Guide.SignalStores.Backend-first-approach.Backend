@@ -1,87 +1,56 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using OpenAPI_Guide.SignalStores.Backend_first_approach.Backend.Data;
+using OpenAPI_Guide.SignalStores.Backend_first_approach.Backend.DTOs;
 using OpenAPI_Guide.SignalStores.Backend_first_approach.Backend.Models;
 
 namespace OpenAPI_Guide.SignalStores.Backend_first_approach.Backend.Services;
 
-public class MovieService(MovieDbContext movieDbContext)
+public class MovieService(AppDbContext dbContext)
 {
-    public async Task<Ok<Movie[]>> GetAllMoviesAsync()
+
+    public async Task<Movie[]> GetAllMoviesAsync()
     {
-        var res = await movieDbContext.Movies.ToArrayAsync();
-        return TypedResults.Ok(res);
+        var movies = await dbContext.Movies.ToArrayAsync();
+        return movies;
     }
 
-    public async Task<IResult> GetMovieByIdAsync(int movieId)
+    public async Task<Movie?> GetMovieByIdAsync(int movieId)
     {
-        try
-        {
-            var movie = await movieDbContext.Movies.FindAsync(movieId);
-            return movie == null ? Results.NotFound("Movie not found") : Results.Ok(movie);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            return Results.BadRequest(e.Message);
-        }
+        var movie = await dbContext.Movies.FindAsync(movieId);
+        return movie ?? null;
     }
 
-    public async Task<IResult> CreateMovieAsync(Movie movie)
+    public async Task<Movie> CreateMovieAsync(Movie movie)
     {
-        try
-        {
-            await movieDbContext.Movies.AddAsync(movie);
-            await movieDbContext.SaveChangesAsync();
+            await dbContext.Movies.AddAsync(movie);
+            await dbContext.SaveChangesAsync();
             
-            return Results.Created("/movies", movie);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            return Results.BadRequest(e.Message);
-        }
+            return movie;
     }
 
-    public async Task<IResult> UpdateMovieAsync(Movie patch, int movieId)
+    public async Task<Movie?> UpdateMovieAsync(MovieDto patch, int movieId)
     {
-        try
-        {
-            var movie = await movieDbContext.Movies.FindAsync(movieId);
-            
-            if (movie == null) return Results.NotFound("Movie not found");
-            movie.Title = patch.Title;
-            movie.Studio = patch.Studio;
-            movie.Year = patch.Year;
 
-            await movieDbContext.SaveChangesAsync();
+        var movie = await dbContext.Movies.FindAsync(movieId);
+        if (movie == null) return null;
 
-            return Results.Json(movie);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            return Results.BadRequest(e.Message);
-        }
+        if (patch.Title != movie.Title && patch.Title != null) movie.Title = patch.Title;
+        if (patch.Studio != movie.Studio && patch.Studio != null) movie.Studio = patch.Studio;
+        if (patch.Year != movie.Year && patch.Year != null) movie.Year = patch.Year.Value;
+
+        await dbContext.SaveChangesAsync();
+
+        return movie;
     }
 
-    public async Task<IResult> DeleteMovieAsync(int movieId)
+    public async Task<bool> DeleteMovieAsync(int movieId)
     {
-        try
-        {
-            var movie = await movieDbContext.Movies.FindAsync(movieId);
+        var movie = await dbContext.Movies.FindAsync(movieId);
+        if (movie == null) return false;
 
-            if (movie == null) return Results.NotFound("Movie not found");
-
-            movieDbContext.Movies.Remove(movie);
-            await movieDbContext.SaveChangesAsync();
-            
-            return Results.NoContent();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            return Results.BadRequest(e.Message);
-        }
+        dbContext.Movies.Remove(movie);
+        await dbContext.SaveChangesAsync();
+        
+        return true;
     }
 }

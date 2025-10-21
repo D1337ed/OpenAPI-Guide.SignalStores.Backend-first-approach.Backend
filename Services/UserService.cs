@@ -1,71 +1,47 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using OpenAPI_Guide.SignalStores.Backend_first_approach.Backend.Data;
+using OpenAPI_Guide.SignalStores.Backend_first_approach.Backend.DTOs;
 using OpenAPI_Guide.SignalStores.Backend_first_approach.Backend.Models;
 
 namespace OpenAPI_Guide.SignalStores.Backend_first_approach.Backend.Services;
 
-public class UserService(UserDbContext userDbContext)
+public class UserService(AppDbContext dbContext)
 {
-    public async Task<Ok<User>> GetCurrentUserAsync(int userId)
+    public async Task<User?> GetCurrentUserAsync(int userId)
     {
-        var res = await userDbContext.Users.FindAsync(userId);
-        return TypedResults.Ok(res);
+        var res = await dbContext.Users.FindAsync(userId);
+        return res;
     }
 
-    public async Task<IResult> CreateUserAsync(User user)
+    public async Task<User> CreateUserAsync(User user)
     {
-        try
-        {
-            await userDbContext.Users.AddAsync(user);
-            await userDbContext.SaveChangesAsync();
+        await dbContext.Users.AddAsync(user);
+        await dbContext.SaveChangesAsync();
 
-            return Results.Created("/users", user);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            return Results.BadRequest(e.Message);
-        }
+        return user;
     }
 
-    public async Task<IResult> UpdateUserAsync(User patch, int userId)
+    public async Task<User?> UpdateUserAsync(UserDto patch, int userId)
     {
-        try
-        {
-            var user = await userDbContext.Users.FindAsync(userId);
-            
-            if (user == null) return Results.NotFound("User not found");
-            user.Name = patch.Name;
-            user.AccessLevel = patch.AccessLevel;
-            
-            await userDbContext.SaveChangesAsync();
+        var user = await dbContext.Users.FindAsync(userId);
+        if (user == null) return null;
+        
+        if (patch.Name != user.Name && patch.Name != null) user.Name = patch.Name;
+        if (patch.AccessLevel != user.AccessLevel && patch.AccessLevel != null) user.AccessLevel = patch.AccessLevel.Value;
+        
+        await dbContext.SaveChangesAsync();
 
-            return Results.Json(user);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            return Results.BadRequest(e.Message);
-        }
+        return user;
     }
 
-    public async Task<IResult> DeleteUserAsync(int userId)
+    public async Task<bool> DeleteUserAsync(int userId)
     {
-        try
-        {
-            var user = await userDbContext.Users.FindAsync(userId);
-            
-            if (user == null) return Results.NotFound("User not found");
+        var user = await dbContext.Users.FindAsync(userId);
+        if (user == null) return false;
 
-            userDbContext.Users.Remove(user);
-            await userDbContext.SaveChangesAsync();
+        dbContext.Users.Remove(user);
+        await dbContext.SaveChangesAsync();
 
-            return Results.NoContent();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            return Results.BadRequest(e.Message);
-        }
+        return true;
     }
 }

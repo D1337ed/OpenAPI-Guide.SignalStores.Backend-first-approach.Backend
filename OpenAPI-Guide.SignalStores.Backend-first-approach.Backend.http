@@ -11,11 +11,11 @@ Accept: application/json
 
 ###
 
-GET {{b}}/3
+GET {{b}}/2
 
 ###
 
-PATCH {{b}}/3
+PATCH {{b}}/2
 Content-Type: application/json
 
 {
@@ -71,7 +71,5 @@ PATCH {{a}}/5
 Content-Type: application/json
 
 {
-  "title": "avatar",
-  "studio": "columbia",
   "year": 2030
 }
