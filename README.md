@@ -203,7 +203,7 @@ and
   dotnet ef database update
 ```
 
-10. After starting with 
+9. After starting with 
 ```shell
   dotnet run
 ```
