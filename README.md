@@ -11,15 +11,15 @@ This Backend is built with the Idea of creating the Models, Database and Routes 
 
 ## File/Folder Overview
 
-### - [`Models`](./Models)
+### - [`Models`](#Models)
 
-### - [`AppDbContext`](./Data/AppDbContext.cs)
+### - [`AppDbContext`](#AppDbContextcs)
 
-### - [`Services`](./Services)
+### - [`Services`](#Services)
 
-### - [`Program`](Program.cs)
+### - [`Program`](#Programcs)
 
-### - [`appsettings.Development.json`](appsettings.Development.json)
+### - [`appsettings.Development.json`](#appsettingsDevelopmentjson)
 
 ---
 
@@ -209,3 +209,5 @@ and
 ```
 the OpenAPI File is available on [`/openapi/v1.json`](http://localhost:5083/openapi/v1.json) and 
 Scalar on [`/scalar/v1`](http://localhost:5083/scalar/v1)
+
+[`Back to Top`](#an-openapi-example-with-net-90-minimal-api-using-a-backend-first-approach-for-multiple-angular-signalstores)
